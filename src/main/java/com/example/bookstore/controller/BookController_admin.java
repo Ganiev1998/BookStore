@@ -3,7 +3,6 @@ package com.example.bookstore.controller;
 import com.example.bookstore.model.Book;
 import com.example.bookstore.model.User;
 import com.example.bookstore.service.BookService_admin;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,22 +11,26 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping
 public class BookController_admin {
     @Autowired
     BookService_admin bookService;
-    @GetMapping("/login_admin")
-    public ModelAndView validation(@RequestParam("userName")String name,
+    @PostMapping("/login_admin")
+    public ModelAndView validation(@RequestParam("userName")String userName,
                                    @RequestParam("password")String password,
-                                   @RequestParam("role_id")String role_id){
+                                   @RequestParam("role_id")Integer role_id){
         User user = bookService.valid(password);
-        if (!(user ==null)){
+        if ((user!=null) && user.getUserName().equals(userName)){
             ModelAndView mv = new ModelAndView("index");
             return mv;
+        }else if (user!=null && !user.getUserName().equals(userName)) {
+            return new ModelAndView("/admin/admin");
+        } else if (user==null) {
+            return new ModelAndView("/admin/admin");
         }
-        return new ModelAndView("index");
+        return new ModelAndView("/admin/admin");
     }
-    @GetMapping("/")
+    @GetMapping
     public ModelAndView login(){
         ModelAndView mv = new ModelAndView("/admin/admin");
         //request.getSession().setAttribute("user",new User(1,"user","1234",1));
@@ -39,7 +42,7 @@ public class BookController_admin {
     }
 
 
-    @GetMapping
+    @GetMapping("get")
     public List<Book> select(){
         return bookService.selectAll();
     }
